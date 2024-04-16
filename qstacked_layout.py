@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(Color("blue"))
         layout.addWidget(Color("yellow"))
 
-        # layout.setCurrentIndex(3)
+        layout.setCurrentIndex(1)
 
         widget = QWidget()
         widget.setLayout(layout)

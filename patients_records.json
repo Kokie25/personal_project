@@ -1,3 +1,22 @@
 {
-  "patients": []
+  "patients": [
+    {
+      "FullNames": "Ignacious Mmotla",
+      "IdentityNo": "9503125448088",
+      "FileNo": "dc066814",
+      "Contact_details": "0727014807",
+      "Alternative_contacts": "0724657504",
+      "Gender": "Male",
+      "About": "consultation"
+    },
+    {
+      "FullNames": "Koketso Motshana",
+      "IdentityNo": "9806170490081",
+      "FileNo": "ff62598f",
+      "Contact_details": "0724657504",
+      "Alternative_contacts": "0728155463",
+      "Gender": "female",
+      "About": "consultation"
+    }
+  ]
 }
