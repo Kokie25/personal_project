@@ -1,5 +1,29 @@
 {
     "patients": [
-      
+        {
+            "FullNames": "Koketso",
+            "LastName": "Motshana",
+            "Title": "Miss",
+            "IdentityNo": "9806170490081",
+            "Gender": "Female",
+            "Physical Address": {
+                "Street": "141 caddie street",
+                "Surburb": "Goudrand",
+                "City": "Rooderport",
+                "Zip": "1723"
+            },
+            "Contact_details": "0724657504",
+            "Email_Address": "kmotshana@gmail.com",
+            "Alternative_contacts": "0727014807",
+            "Next_of_kin": {
+                "Title": "Mr",
+                "Initials": "I",
+                "First Name": "Ignacious",
+                "Last Name": "Mmotla",
+                "Contact details": "0727014807"
+            },
+            "Notes": "Consultation",
+            "FileNo": "d4a919cc"
+        }
     ]
 }
