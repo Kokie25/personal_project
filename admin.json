@@ -1,7 +1,7 @@
 {
     "AdminAutho": [{
-        "username":"Koketso",
-        "password":"Mehla@25"
+        "admin_username":"Koketso",
+        "admin_password":"Mehla@25"
     }]
     
 }
