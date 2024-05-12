@@ -58,10 +58,41 @@ def cancel_action():
 
     if messagebox.askokcancel("Cancel", "Are you sure you want to cancel?"):
         root.destroy()
-def retrieve_info():
 
+def file_retrieve():
+
+    id_root.deiconify()
+    root.withdraw()
+    data = load_data_to_json()
     Identity = id_no_entry.get()
+    for file in data["patients"]:
+        if Identity == file["IdentityNo"]:
+            retrieve_root.deiconify()
+            id_root.withdraw()
+        return Identity
+    
+id_root = Tk()
+id_root.title("Patient Data Form")
+form_width = 500
+form_height =500
+id_root.geometry(f"{form_width}x{form_height}")
+id_root.configure(bg="lightblue")
+id_label = Label(text="SA ID number:")
+id_label.pack(padx=10, pady=5, anchor="w")
+id_no_entry = Entry(width=40, validate="key", validatecommand=(id_root.register(validate_numbers_input), "%P"),
+                       highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
+id_no_entry.pack(padx=10, pady=5, anchor="w")
+
+
+id_button = Button(text="Submit", command=file_retrieve,fg="green",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
+id_button.pack(side ="bottom",pady=10, anchor="w")
+    
+id_root.withdraw()
+
+def retrieve_info(Identity):
+
     retrieve_data = load_data_to_json()
+
     for retrieve in retrieve_data["patients"]:
         if Identity == retrieve["IdentityNo"]:
             First_name_entry.insert(0, retrieve["FullNames"])
@@ -219,6 +250,9 @@ notes_label.pack(padx=10, pady=5, anchor="w")
 notes_combobox = ttk.Combobox(scrollable_frame, values=["Consultation", "Immunisation", "Collecting Medication","Checkup","Vaccination"],state="readonly",width=37)
 notes_combobox.pack(padx=10, pady=5, anchor="w")
 
+
+
+
 retrieve_root.withdraw()
 
 def register():
@@ -304,7 +338,7 @@ def register():
 root = Tk()
 root.title("Patient Registration Form")
 form_width = 500
-form_height =500
+form_height =700
 root.geometry(f"{form_width}x{form_height}")
 root.configure(bg="lightblue")
 
@@ -445,8 +479,10 @@ cancel_button.pack(side ="bottom",pady=10, anchor="w")
 register_button = Button(scrollable_frame, text="Register", command=register,fg="green",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
 register_button.pack(side ="bottom",pady=10, anchor="w")
 
-retrieve_data = Button(scrollable_frame, text="Retrieve Data", command=retrieve_info,fg="green",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
-register_button.pack(side ="bottom",pady=10, anchor="w")
+retrieve_button = Button(scrollable_frame, text="Retrieve Data", command= file_retrieve,fg="yellow",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
+retrieve_button.pack(side ="bottom",pady=10, anchor="w")
+
+
 
 def is_admin_clerk(system_username):
 
