@@ -89,169 +89,89 @@ id_button.pack(side ="bottom",pady=10, anchor="w")
     
 id_root.withdraw()
 
-def retrieve_info(Identity):
+def open_retrieve_window():
+    retrieve_window = tk.Toplevel(root)
+    retrieve_window.title("Retrieve Patient Data")
+    
+    tk.Label(retrieve_window, text="Enter ID Number:").pack(pady=5)
+    identity_entry = tk.Entry(retrieve_window)
+    identity_entry.pack(pady=5)
+    
+def search_patient():
 
-    retrieve_data = load_data_to_json()
+    identityno = identity_entry.get()
+    
+    if not identityno.isdigit() or len(str(identityno)) != 13:
+        messagebox.showerror("Error", "Please enter a valid 13-digit ID number.")
+        return
+    
+    try:
+        with open(Data_file, "r") as json_file:
+            data = json.load(json_file)
+    except FileNotFoundError:
+        messagebox.showerror("Error", "Data file not found.")
+        return
+    
+    for patient in data["patients"]:
+        if patient["IdentityNo"] == identityno:
+            fill_form(patient)
+            return
+    
+    messagebox.showinfo("Not Found", "Patient with the given ID number does not exist.")
 
-    for retrieve in retrieve_data["patients"]:
-        if Identity == retrieve["IdentityNo"]:
-            First_name_entry.insert(0, retrieve["FullNames"])
-            Last_name_entry.insert(0, retrieve["LastName"])
-            title_combobox.set(retrieve["Title"])
-            identity_entry.insert(0, retrieve["IdentityNo"])
-            gender_combobox.set(retrieve["Gender"])
-            Mobile_entry.insert(0, retrieve["Contact_details"])
-            email_entry.insert(0, retrieve["Email_Address"])
-            Alternative_contacts.insert(0, retrieve["Alternative_contacts"])
-            for index, label_text in enumerate(physical_address_labels):
-                physical_address_entries[index].insert(0, retrieve["Physical Address"][label_text.split(":")[0]])
-            for index, label_text in enumerate(next_of_kin_labels):
-                if label_text != "Contact details:":
-                    next_of_kin_entries[index].insert(0, retrieve["Next_of_kin"][label_text.split(":")[0]])
-                else:
-                    next_of_kin_entries[index].insert(0, retrieve["Next_of_kin"]["Contact details"])
-            File_no_entry.insert(0, retrieve["FileNo"])
-            notes_combobox.set(retrieve["Notes"])
-            break
+def fill_form(patient):
+
+    First_name_entry.delete(0, END)
+    First_name_entry.insert(0, patient["FullNames"])
+    Last_name_entry.delete(0, END)
+    Last_name_entry.insert(0, patient["LastName"])
+    title_combobox.set(patient["Title"])
+    gender_combobox.set(patient["Gender"])
+    File_no_entry.delete(0, END)
+    File_no_entry.insert(0, patient["FileNo"])
+    email_entry.delete(0, END)
+    email_entry.insert(0, patient["Email_Address"])
+    Mobile_entry.delete(0, END)
+    Mobile_entry.insert(0, patient["Contact_details"])
+    Alternative_contacts.delete(0, END)
+    Alternative_contacts.insert(0, patient["Alternative_contacts"])
+    notes_combobox.set(patient["Notes"])
+    
+    physical_address_entries[0].delete(0, END)
+    physical_address_entries[0].insert(0, patient["Physical Address"]["Street"])
+    physical_address_entries[1].delete(0, END)
+    physical_address_entries[1].insert(0, patient["Physical Address"]["Surburb"])
+    physical_address_entries[2].delete(0, END)
+    physical_address_entries[2].insert(0, patient["Physical Address"]["City"])
+    physical_address_entries[3].delete(0, END)
+    physical_address_entries[3].insert(0, patient["Physical Address"]["Zip"])
+
+    next_of_kin_entries[0].delete(0, END)
+    next_of_kin_entries[0].insert(0, patient["Next_of_kin"]["Title"])
+    next_of_kin_entries[1].delete(0, END)
+    next_of_kin_entries[1].insert(0, patient["Next_of_kin"]["Initials"])
+    next_of_kin_entries[2].delete(0, END)
+    next_of_kin_entries[2].insert(0, patient["Next_of_kin"]["First Name"])
+    next_of_kin_entries[3].delete(0, END)
+    next_of_kin_entries[3].insert(0, patient["Next_of_kin"]["Last Name"])
+    next_of_kin_entries[4].delete(0, END)
+    next_of_kin_entries[4].insert(0, patient["Next_of_kin"]["Contact details"])
 
 retrieve_root = Tk()
-retrieve_root.title("Patient Registration Form")
-form_width = 500
-form_height =500
-retrieve_root.geometry(f"{form_width}x{form_height}")
-retrieve_root.configure(bg="lightblue")
-
-canvas = Canvas(retrieve_root)
-scrollbar = Scrollbar(retrieve_root, orient="vertical", command=canvas.yview)
-scrollable_frame = Frame(canvas)
-
-scrollable_frame.bind(
-    "<Configure>",
-    lambda e: canvas.configure(
-        scrollregion=canvas.bbox("all")
-    )
-)
-
-canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-canvas.configure(yscrollcommand=scrollbar.set)
-
-canvas.pack(side="left", fill="both", expand=True)
-scrollbar.pack(side="right", fill="y")
+retrieve_root.title("SA ID NO")
 
 
-personal_label = Label(scrollable_frame, text="PERSONAL DETAILS", font=("Arial", 12, "bold"))
-personal_label.pack(padx=10, pady=10, anchor="w")
-
-first_name_label = Label(scrollable_frame, text="First Name:")
-validate_name = retrieve_root.register(validate_name_input)
-first_name_label.pack(padx=10, pady=5, anchor="w")
-First_name_entry = Entry(scrollable_frame, width=40,validate="key", validatecommand =(validate_name, "%P"),
-                         highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-First_name_entry.pack(padx=10, pady=5, anchor="w")
-
-last_name_label = Label(scrollable_frame, text="Last Name:")
-last_name_label.pack(padx=10, pady=5, anchor="w")
-validate_lastname = retrieve_root.register(validate_name_input)
-Last_name_entry = Entry(scrollable_frame, width=40,validate="key", validatecommand =(validate_lastname, "%P"),highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46"
-                    ,highlightthickness = 1, bd=5,font='sans 10 bold')
-Last_name_entry.pack(padx=10, pady=5, anchor="w")
-
-
-title_label = ttk.Label(scrollable_frame, text="Title:")
-title_label.pack(padx=10, pady=5, anchor="w")
-title_combobox = ttk.Combobox(scrollable_frame, values=["Mr", "Ms", "Mrs", "Miss", "Dr"],state="readonly", width=37)
-title_combobox.pack(padx=10, pady=5, anchor="w")
-
-identity_label = Label(scrollable_frame, text="SA ID number:")
-identity_label.pack(padx=10, pady=5, anchor="w")
-identity_entry = Entry(scrollable_frame, width=40, validate="key", validatecommand=(retrieve_root.register(validate_numbers_input), "%P"),
-                       highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-identity_entry.pack(padx=10, pady=5, anchor="w")
-
-gender_label = Label(scrollable_frame, text="Gender:")
-gender_label.pack(padx=10, pady=5, anchor="w")
-gender_combobox = ttk.Combobox(scrollable_frame, values=["Male", "Female", "Other"],state="readonly", width=37)
-gender_combobox.pack(padx=10, pady=5, anchor="w")
-
-mobile_label = Label(scrollable_frame, text="Contact no:")
-mobile_label.pack(padx=10, pady=5, anchor="w")
-Mobile_entry = Entry(scrollable_frame, width=40,validate="key", validatecommand=(retrieve_root.register(validate_numbers_input), "%P"),
-                             highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-Mobile_entry.pack(padx=10, pady=5, anchor="w")
-
-altContact_label = Label(scrollable_frame, text="Alternative no:")
-altContact_label.pack(padx=10, pady=5, anchor="w")
-Alternative_contacts = Entry(scrollable_frame, width=40,validate="key", validatecommand=(retrieve_root.register(validate_numbers_input), "%P"),
-                             highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-Alternative_contacts.pack(padx=10, pady=5, anchor="w")
-
-email_label = Label(scrollable_frame, text="Email Address:")
-email_label.pack(padx=10, pady=5, anchor="w")
-email_entry = Entry(scrollable_frame, width=40,highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-email_entry.pack(padx=10, pady=5, anchor="w")
-
-phys_address_label = Label(scrollable_frame, text="PHYSICAL ADDRESS", font=("Arial", 12, "bold"))
-phys_address_label.pack(padx=10, pady=10, anchor="w")
-
-physical_address_labels = [
-    "Street address:", "Surburb:", "City:", "Zip code:"
-]
-physical_address_entries = []
-
-for label_text in physical_address_labels:
-    frame = Frame(scrollable_frame)
-    frame.pack(padx=10, pady=5, anchor="w")
-
-    label = Label(frame, text=label_text)
-    label.pack(side="left")
-
-    address_entry = Entry(frame, width=37,highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-    address_entry.pack(side="left", padx=(10, 0))
-    physical_address_entries.append(address_entry)
-
-next_of_kin_label = Label(scrollable_frame, text="NEXT OF KIN DETAILS", font=("Arial", 12, "bold"))
-next_of_kin_label.pack(padx=10, pady=10, anchor="w")
-
-next_of_kin_labels = [
-    "Title:", "Initials:", "First Name:","Last Name:","Contact details:"
-]
-next_of_kin_entries = []
-
-for label_text in next_of_kin_labels:
-    frame = Frame(scrollable_frame)
-    frame.pack(padx=10, pady=5, anchor="w")
-
-    label = Label(frame, text=label_text)
-    label.pack(side="left")
-
-    if label_text == "Title:":
-        title_options = ["Mr", "Ms", "Mrs", "Miss", "Dr"]
-        kin_entry = ttk.Combobox(frame, values=title_options, state="readonly",width=34)
-    else:
-        kin_entry = Entry(frame, width=37,highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-        if label_text == "Contact details:":
-            kin_entry = Entry(frame, width=37,validate="key", validatecommand=(retrieve_root.register(validate_numbers_input), "%P"),
-                                highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
-    
-    kin_entry.pack(side="left", padx=(10, 0))
-    next_of_kin_entries.append(kin_entry)
-
-
-file_no = str(uuid4())[:8]  
-file_label = Label(scrollable_frame, text="File No:")
-file_label.pack(padx=10, pady=5, anchor="w")
-File_no_entry = Entry(scrollable_frame, width=40,highlightcolor = 'green', bg='#F3FEFF', fg='black', highlightbackground='green',highlightthickness = 1, bd=5,font='sans 10 bold')
-
-File_no_entry.insert(0, file_no)
-File_no_entry.pack(padx=10, pady=5, anchor="w")
-
-notes_label = Label(scrollable_frame, text="Description:")
-notes_label.pack(padx=10, pady=5, anchor="w")
-notes_combobox = ttk.Combobox(scrollable_frame, values=["Consultation", "Immunisation", "Collecting Medication","Checkup","Vaccination"],state="readonly",width=37)
-notes_combobox.pack(padx=10, pady=5, anchor="w")
+First_name_entry = Entry(retrieve_root)
+First_name_entry.pack()
 
 
 
+identity_entry = Entry(retrieve_root)
+identity_entry.pack()
+
+
+search_button = Button(retrieve_root, text="Search by ID", command=search_patient)
+search_button.pack()
 
 retrieve_root.withdraw()
 
@@ -479,7 +399,7 @@ cancel_button.pack(side ="bottom",pady=10, anchor="w")
 register_button = Button(scrollable_frame, text="Register", command=register,fg="green",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
 register_button.pack(side ="bottom",pady=10, anchor="w")
 
-retrieve_button = Button(scrollable_frame, text="Retrieve Data", command= file_retrieve,fg="yellow",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
+retrieve_button = Button(scrollable_frame, text="Retrieve Data", command= fill_form,fg="yellow",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
 retrieve_button.pack(side ="bottom",pady=10, anchor="w")
 
 
