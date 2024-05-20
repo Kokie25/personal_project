@@ -10,7 +10,9 @@ employees_file = "employees_logins.json"
 admin_file = "admin.json"
 doctors_file ="doctor_login.json"
 availability_file = 'doctor_availability.json'
-
+current_user_role = None
+user_exists = False
+password_correct = False
 
 def save_data_to_json(data):
     """Save data to the JSON file."""
@@ -32,20 +34,24 @@ def load_employee_data_to_json():
         with open(employees_file, "r") as file:
             return json.load(file)
 
+
 def save_admin_data_to_json(data):
     """Save data to the JSON file."""
     with open(admin_file, "w") as file:
         json.dump(data, file, indent=4)
+
 
 def load_admin_data_to_json():
     if os.path.exists(admin_file):
         with open(admin_file, "r") as file:
             return json.load(file)
 
+
 def save_dr_data_to_json(data):
     """Save data to the JSON file."""
     with open(doctors_file, "w") as file:
         json.dump(data, file, indent=4)
+
 
 def load_dr_data_to_json():
     if os.path.exists(doctors_file):
@@ -113,8 +119,9 @@ def fill_form(patient):
     Mobile_entry.insert(0, patient["Contact_details"])
     Alternative_contacts.delete(0, END)
     Alternative_contacts.insert(0, patient["Alternative_contacts"])
-    notes_combobox.set(patient["Notes"])
-    
+    notes_combobox.set(patient["Description"])
+    Notes_entry.delete(0, END)
+    Notes_entry.insert(0, patient["Notes"])
     
     physical_address_entries[0].delete(0, END)
     physical_address_entries[0].insert(0, patient["Physical Address"]["Street"])
@@ -159,7 +166,7 @@ def register():
     if not identityno.isdigit() or len(str(identityno)) != 13:
         messagebox.showerror("Error", "Please enter a valid 13-digit ID number.")
         return
-    notes = notes_combobox.get()
+    description= notes_combobox.get()
     Physical_Address = {
         "Street": physical_address_entries[0].get(),
         "Surburb": physical_address_entries[1].get(),
@@ -176,6 +183,13 @@ def register():
         
     }
     print("Created Physical Address and Next of Kin dicts...")
+
+    notes = ""
+    if current_user_role == "Doctor":
+        notes = Notes_entry.get()
+        if notes.strip() == "":
+            messagebox.showerror("Error", "Please enter notes before submitting.")
+            return
     
     new_patient = {
         "FullNames": patient_name,
@@ -188,8 +202,9 @@ def register():
         "Email_Address": email,
         "Alternative_contacts": alternative_contacts,
         "Next_of_kin": Next_of_kin,
-        "Notes": notes,
+        "Description": description,
         "FileNo": file_number,
+        "Notes":notes,
     }
     print("Created new patient dict...")
 
@@ -215,6 +230,7 @@ def register():
     messagebox.showinfo("Success", "Registration successful!")
     print("Registration successful!")
 
+    return identityno
 
 root = Tk()
 root.title("Patient Registration Form")
@@ -347,23 +363,26 @@ File_no_entry = Entry(scrollable_frame, width=40,highlightcolor = 'green', bg='#
 File_no_entry.insert(0, file_no)
 File_no_entry.pack(padx=10, pady=5, anchor="w")
 
-notes_label = Label(scrollable_frame, text="Description:")
-notes_label.pack(padx=10, pady=5, anchor="w")
+description_label = Label(scrollable_frame, text="Description:")
+description_label.pack(padx=10, pady=5, anchor="w")
 notes_combobox = ttk.Combobox(scrollable_frame, values=["Consultation", "Immunisation", "Collecting Medication","Checkup","Vaccination"],state="readonly",width=37)
 notes_combobox.pack(padx=10, pady=5, anchor="w")
 
+notes_label = Label(scrollable_frame, text="Notes:")
+notes_label.pack(padx=10, pady=5, anchor="w")
+Notes_entry = Entry(scrollable_frame, width=40,state="readonly",highlightcolor = 'green', bg='#F3FEFF',fg ="#393e46",highlightthickness = 1, bd=5,font='sans 10 bold')
+Notes_entry.pack(padx=10, pady=5, anchor="w")
 
 register_button = Button(scrollable_frame, text="Register", command=register,fg="green",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
 register_button.pack(side ="bottom",pady=10, anchor="w")
 
 
-cancel_button = Button(scrollable_frame,text="Cancel",command = cancel_action,fg="grey",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
+cancel_button = Button(scrollable_frame,text="Cancel",command = cancel_action,fg="red",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
 cancel_button.pack(side ="bottom",pady=10, anchor="w")
 
 
 retrieve_button = Button(scrollable_frame, text="Retrieve Data", command= search_patient,fg="yellow",bg="white",highlightbackground = "lightgrey",highlightthickness = 1, bd=5,font='sans 10 bold')
 retrieve_button.pack(side ="bottom",pady=10, anchor="w")
-
 
 
 def is_admin_clerk(system_username):
@@ -454,145 +473,115 @@ cancel_button = Button(employee_register_window,text="Cancel",command = cancel_a
 cancel_button.pack()
 
 employee_register_window.withdraw()
-def init_db():
-    if not os.path.exists(availability_file):
-        with open(availability_file, 'w') as file:
-            json.dump([], file)
-
-# Function to read data from the JSON database
-def read_db():
-    with open(availability_file, 'r') as file:
-        return json.load(file)
-
-# Function to write data to the JSON database
-def write_db(data):
-    with open(availability_file, 'w') as file:
-        json.dump(data, file, indent=4)
-
-# Function to save availability to the JSON database
-def available_dr():
-
-    availability = available_combobox.get()
-    doctor_name = doctor_name_entry.get()
-    
-    if not doctor_name or not availability:
-        print("Doctor name and availability are required")
-        return
-
-    # Read existing data
-    data = read_db()
-    
-    # Append new entry
-    data.append({'doctor_name': doctor_name, 'available_date': availability})
-    
-    # Write back to the database
-    write_db(data)
-    
-    # Clear inputs
-    doctor_name_entry.delete(0, END)
-    available_combobox.set('')
-
-# Function to retrieve and display availability
-def retrieve_availability():
-    data = read_db()
-    for entry in data:
-        print(entry)
 
 
-init_db()
-
-# Setup the main window
-availability_root = Tk()
-availability_root.title('Doctor Availability')
-
-# Doctor name entry
-dr_name = Label(root, text="Doctor Name:")
-dr_name.pack()
-doctor_name_entry = Entry(availability_root)
-doctor_name_entry.pack()
-
-# Availability combobox
-avail = Label(root, text="Availability:")
-avail.pack()
-available_combobox = ttk.Combobox(root, values=[
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
-])
-available_combobox.pack()
-
-# Submit button
-submit_button = Button(availability_root, text="Submit", command=available_dr)
-submit_button.pack()
-
-# Retrieve button
-retrieve_button = Button(availability_root, text="Retrieve Availability", command=retrieve_availability)
-retrieve_button.pack()
-
-availability_root.withdraw()
 
 def login():
-
+    global current_user_role
     data = load_employee_data_to_json()
     data_admin = load_admin_data_to_json()
     data_dr = load_dr_data_to_json()
     system_username = login_username_entry.get().title()
     system_password = login_password_entry.get()
-    user_exists = False
     password_correct = False
+    
 
     for employee in data.get("credentials"):
         if employee["Username"] == system_username:
             user_exists = True    
             if employee["Username"] == system_username and employee["password"] == system_password:
                 password_correct = True
+                current_user_role = "Employee"
                 messagebox.showinfo("Logged in", system_username + " Logged in successfully")
                 root.deiconify()
                 login_window.withdraw()
-                return
+                break
 
-    for admin in data_admin.get("AdminAutho"):
-        if admin["admin_username"] == system_username:
-            user_exists = True
-            if admin["admin_username"] == system_username and admin["admin_password"] == system_password:
-                password_correct = True
-                employee_register_window.deiconify()
-                login_window.withdraw()
-                return
+    if not password_correct:
+        for admin in data_admin.get("AdminAutho"):
+            if admin["admin_username"] == system_username:
+                user_exists = True
+                if admin["admin_username"] == system_username and admin["admin_password"] == system_password:
+                    password_correct = True
+                    current_user_role = "Admin"
+                    employee_register_window.deiconify()
+                    login_window.withdraw()
+                    break
+
+    if not password_correct:
+        for doctor in data_dr.get("Doctors"):
+            if doctor["password"] == system_password:
+                user_exists =True
+                if doctor["Username"] == system_username and doctor["password"] == system_password:
+                    password_correct = True
+                    current_user_role = "Doctor"
+                    root.deiconify()
+                    login_window.withdraw()
+                    break
+                
+    if password_correct:
+        if current_user_role == "Doctor":
+            Notes_entry.config(state="normal")
             
-    for doctor in data_dr.get("Doctors"):
-        if doctor["password"] == system_password:
-            user_exists =True
-            if doctor["Username"] == system_username and doctor["password"] == system_password:
-                password_correct =True
-                availability_root.deiconify()
-                login_window.withdraw()
+        else:
+            Notes_entry.config(state="readonly")
+    else:
+        if user_exists:
+            messagebox.showerror("Login Failed", "Invalid username or password, try again or contact the admin")
+        else:
+            messagebox.showerror("Login Failed", "Login details do not exist, contact admin to register into the system as an employee")
 
+    return 
 
-    if user_exists and not password_correct:
-        messagebox.showerror("Login Failed", "Invalid username or password, try again or contact the admin")
-    elif not user_exists:
-        messagebox.showerror("Login Failed", "Login details do not exist, contact admin to register into the system as an employee")
+def update_patient_notes(identityno):
 
-        
+    if current_user_role != "Doctor":
+        messagebox.showerror("Error", "Only doctors can update notes")
+        return
+    
+
+    new_notes = Notes_entry.get()
+    
+    if not new_notes:
+        messagebox.showerror("Error", "Notes cannot be empty")
+        return
+    
+    patient_data = load_data_to_json()
+    for patient in patient_data.get("patients", []):
+        if patient["IdentityNo"] == identityno:
+            fill_form(patient)
+            patient["Notes"] = new_notes
+            save_data_to_json(patient_data)
+            fill_form(patient)
+            messagebox.showinfo("Success", "Notes updated successfully!")
+            return   
+    messagebox.showerror("Error", "Patient ID not found")
+      
+def add_notes():
+
+    identityno = identity_entry.get()
+    update_patient_notes(identityno)
+
+Add_notes_button = Button(scrollable_frame, text="Add Notes", command= add_notes, fg="yellow", bg="white", 
+                          highlightbackground="lightgrey", highlightthickness=1, bd=5, font='sans 10 bold')
+Add_notes_button.pack(side="bottom", pady=10, anchor="w")
+
 
 login_window = Tk()
 login_window.title("Login")
-
 
 username_label = Label(login_window, text="Username:")
 username_label.pack()
 login_username_entry = Entry(login_window)
 login_username_entry.pack()
 
-
 password_label = Label(login_window, text="Password:")
 password_label.pack()
 login_password_entry = Entry(login_window, show="*")  
 login_password_entry.pack()
 
-
 login_button = Button(login_window, text="Login", command=login)
 login_button.pack()
-
 
 root.withdraw()
 login_window.mainloop()
