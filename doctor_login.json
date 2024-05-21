@@ -1,8 +1,13 @@
 {
     "Doctors": [
         {
-            "Username": "Ignacious",
-            "password": "Mmotla29"
+            "Username": "Dr M",
+            "password": "Mmotla@dr_",
+            "Role": "Doctor"
+        },
+        {
+            "Username": "Iggy",
+            "password": "Iggy@dr_"
         }
     ]
 }
