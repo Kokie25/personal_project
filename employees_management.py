@@ -11,9 +11,6 @@ from main_file import *
 
 employees_file = "employees_logins.json"
 admin_file = "admin.json"
-doctors_file ="doctor_login.json"
-availability_file = 'doctor_availability.json'
-current_user_role = None
 user_exists = False
 password_correct = False
 
@@ -42,18 +39,7 @@ def load_admin_data_to_json():
             return json.load(file)
 
 
-def save_dr_data_to_json(data):
-    """Save data to the JSON file."""
-    with open(doctors_file, "w") as file:
-        json.dump(data, file, indent=4)
-
-
-def load_dr_data_to_json():
-    if os.path.exists(doctors_file):
-        with open(doctors_file, "r") as file:
-            return json.load(file)
         
-
 def is_admin_clerk(system_username):
 
     admin_data = load_admin_data_to_json()
