@@ -14,52 +14,48 @@ def cancel_reg():
         employee_register_window.destroy()
         login_window.deiconify()
 
-
+    
 def employees_registration():
 
+    
     system_username = username_entry.get().title()
     system_password = password_entry.get()
-   
 
     new_employee = {
         "Username": system_username,
         "password": system_password,
-        
     }
 
-    
-    try:
-        with open(employees_file, "r") as json_file:
-            data = json.load(json_file)
-    except FileNotFoundError:
-        data = {"credentials": []}
+    employee_data = load_employee_data_to_json()
+    doctor_data = load_doctor_data()
 
-   
-    
-    
-    for employee in data["credentials"]:
-
-        if employee["Username"] == system_username and employee["password"] == system_password:
-            messagebox.showerror("Registration Failed", "Username and password combination already exists")
+    for employee in employee_data["credentials"]:
+        if employee["Username"] == system_username:
+            messagebox.showerror("Registration Failed", "Username already exists")
             return
 
-    
- 
-        if "@admin" in system_password:
-            data["credentials"].append(new_employee)
-            print("Appended new employee data to employees database...")
+  
+    for doctor in doctor_data["Doctor"]:
+        if doctor["Username"] == system_username:
+            messagebox.showerror("Registration Failed", "Username already exists")
+            return
 
-            with open(employees_file, "w") as json_file:
-                json.dump(data, json_file, indent=4)
-            print("Data written to employees JSON file...")
-            messagebox.showinfo("Success", "Registration successful!")
-            login_window.deiconify()
-            employee_register_window.withdraw()
-            
-    
+    if "@dr_" in system_password:
+        doctor_data["Doctor"].append(new_employee)
+        save_doctor_data(doctor_data)
+        messagebox.showinfo("Success", "Doctor registration successful!")
+        login_window.deiconify()
+        employee_register_window.withdraw()
+
+    elif "@admin" in system_password:
+        employee_data["credentials"].append(new_employee)
+        save_employee_data_to_json(employee_data)
+        messagebox.showinfo("Success", "Admin registration successful!")
+        login_window.deiconify()
+        employee_register_window.withdraw()
+
     else:
-        if "@admin" not in system_password :
-            messagebox.showerror("Registration Failed","Incorrect password.Try again!")
+        messagebox.showerror("Registration Failed", "Incorrect password. Try again!")
 
 
 
@@ -91,15 +87,17 @@ employee_register_window.withdraw()
 
 
 
-
 def login():
     
     data = load_employee_data_to_json()
     data_admin = load_admin_data_to_json()
+    data_doctor = load_doctor_data()
     system_username = login_username_entry.get().title()
     system_password = login_password_entry.get()
     password_correct = False
     user_exists = False
+    
+   
 
     for employee in data.get("credentials", []):
         if employee["Username"] == system_username:
@@ -109,7 +107,7 @@ def login():
                 messagebox.showinfo("Logged in", system_username + " Logged in successfully")
                 root.deiconify()
                 login_window.withdraw()
-                return
+                return system_password
 
     if not password_correct:
         for admin in data_admin.get("AdminAutho", []):
@@ -120,14 +118,27 @@ def login():
                     messagebox.showinfo("Logged in", system_username + " Logged in successfully")
                     employee_register_window.deiconify()
                     login_window.withdraw()
-                    return
-
+                    return system_password
+                
+    if not password_correct:
+        for doctor in data_doctor.get("Doctor", []):
+            if doctor["Username"] == system_username:
+                user_exists = True
+                if doctor["password"] == system_password:
+                    password_correct = True
+                    if "@dr_" in system_password:
+                        Notes_text.config(state='normal')
+                    messagebox.showinfo("Logged in", system_username + " Logged in successfully")
+                    root.deiconify()
+                    login_window.withdraw()
+                    return system_password
+    
     if user_exists:
         messagebox.showerror("Login Failed", "Invalid username or password, try again or contact the admin")
     else:
         messagebox.showerror("Login Failed", "Login details do not exist, contact admin to register into the system as an employee")
 
-    return
+    return None
 
 
 login_window = Tk()

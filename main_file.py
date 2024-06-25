@@ -4,20 +4,23 @@ from uuid import uuid4
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from Employees_logins_info import *
+import Employees_logins_info as login
+from employees_management import *
 
-Data_file = "patients_records.json"
-current_user_role = None
+
+patients_records = "patients_records.json"
+user1 = load_admin_data_to_json()
+user2 = load_doctor_data()
 
 
 def save_data_to_json(data):
     """Save data to the JSON file."""
-    with open(Data_file, "w") as file:
+    with open(patients_records, "w") as file:
         json.dump(data, file, indent=4)
 
 def load_data_to_json():
-    if os.path.exists(Data_file):
-        with open(Data_file, "r") as file:
+    if os.path.exists(patients_records):
+        with open(patients_records, "r") as file:
             return json.load(file)
         
 
@@ -36,24 +39,26 @@ def validate_numbers_input(text):
 def validate_name_input(new_value):
     return new_value.isalpha() or new_value == "" 
 
+
 def cancel_action():
 
     if messagebox.askokcancel("Cancel", "Are you sure you want to cancel?"):
         root.destroy()
+    
         return
 
-
-    
+   
 def search_patient():
 
     identityno = identity_entry.get()
+
     
     if not identityno.isdigit() or len(str(identityno)) != 13:
         messagebox.showerror("Error", "Please enter a valid 13-digit ID number.")
         return
     
     try:
-        with open(Data_file, "r") as json_file:
+        with open(patients_records, "r") as json_file:
             data = json.load(json_file)
     except FileNotFoundError:
         messagebox.showerror("Error", "Data file not found.")
@@ -67,6 +72,8 @@ def search_patient():
     messagebox.showinfo("Not Found", "Patient with the given ID number does not exist.")
 
 def fill_form(patient):
+    
+    system_password = login.login()
 
     First_name_entry.delete(0, END)
     First_name_entry.insert(0, patient["FullNames"])
@@ -83,7 +90,16 @@ def fill_form(patient):
     Alternative_contacts.delete(0, END)
     Alternative_contacts.insert(0, patient["Alternative_contacts"])
     notes_combobox.set(patient["Description"])
+
+    Notes_text.config(state='normal') 
+    Notes_text.delete(1.0, END)
+    Notes_text.insert(1.0, patient["Notes"])
     
+    if "@dr_" in system_password:
+        Notes_text.config(state='normal')
+    else:
+        Notes_text.config(state='disabled')
+            
         
     physical_address_entries[0].delete(0, END)
     physical_address_entries[0].insert(0, patient["Physical Address"]["Street"])
@@ -103,6 +119,30 @@ def fill_form(patient):
     next_of_kin_entries[4].delete(0, END)
     next_of_kin_entries[4].insert(0, patient["Next_of_kin"]["Contact details"])
 
+def add_notes():
+
+    identityno = identity_entry.get()
+    
+    try:
+        with open(patients_records, "r") as json_file:
+            data = json.load(json_file)
+    except FileNotFoundError:
+        messagebox.showerror("Error", "Data file not found.")
+        return
+    
+    
+    for patient in data["patients"]:
+        if patient["IdentityNo"] == identityno:
+            
+            patient["Notes"] = Notes_text.get("1.0", "end-1c")
+            
+            with open(patients_records, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+            
+            messagebox.showinfo("Success", "Notes added successfully.")
+            return
+    
+    messagebox.showerror("Error", "Patient not found.")
 
 
 def register():
@@ -145,7 +185,7 @@ def register():
         
     }
     print("Created Physical Address and Next of Kin dicts...")
-
+    Notes = Notes_text.get("1.0", "end-1c")
    
     
     new_patient = {
@@ -160,13 +200,14 @@ def register():
         "Alternative_contacts": alternative_contacts,
         "Next_of_kin": Next_of_kin,
         "Description": description,
-        "FileNo": file_number
+        "FileNo": file_number,
+        "Notes":Notes
         
     }
     print("Created new patient dict...")
 
     try:
-        with open(Data_file, "r") as json_file:
+        with open(patients_records, "r") as json_file:
             data = json.load(json_file) 
 
     except FileNotFoundError:
@@ -181,7 +222,7 @@ def register():
     print("Appended new patient data...")
 
 
-    with open(Data_file, "w") as json_file:
+    with open(patients_records, "w") as json_file:
         json.dump(data, json_file, indent=4)
     print("Data written to JSON file...")
 
@@ -325,6 +366,14 @@ description_label.pack(padx=10, pady=5, anchor="nw")
 notes_combobox = ttk.Combobox(scrollable_frame, values=["Consultation", "Immunisation", "Collecting Medication", "Checkup", "Vaccination"], state="readonly", width=37)
 notes_combobox.pack(padx=10, pady=5, anchor="nw")
 
+notes_label = Label(scrollable_frame,text = "Notes",bg="#E7D4B5")
+notes_label.pack(padx=10, pady=5, anchor="nw")
+Notes_text = Text(scrollable_frame, width=40, height=10, highlightcolor='green', bg='#F3FEFF', fg='black', highlightbackground='green', highlightthickness=1, bd=5, font='sans 10 bold', state='disabled')
+Notes_text.pack(padx=10, pady=5, anchor="nw")
+
+
+add_notes = Button(scrollable_frame, text="Add notes", command=add_notes, fg="green", bg="white", highlightbackground="lightgrey", highlightthickness=1, bd=5, font='sans 10 bold')
+add_notes.pack(side="bottom", pady=10, anchor="nw")
 
 
 register_button = Button(scrollable_frame, text="Register", command=register, fg="green", bg="white", highlightbackground="lightgrey", highlightthickness=1, bd=5, font='sans 10 bold')
