@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Registration</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            z-index: 1;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label, input {
+            margin-bottom: 5px;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+        }
+        button[type="submit"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 10px;
+            color: red;
+        }
+        .buttons-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+        .buttons-container button {
+            width: 100px; /* Adjust the width as needed */
+        }
+    </style>
+</head>
+<body>
+    <img src="static/css/hospit.jpg" class="background-image" alt="Background Image">
+    <div class="container">
+        <h1>Employee Registration</h1>
+        <form action="{{ url_for('employee_registration') }}" method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Register</button>
+            </div>
+        </form>
+        <div class="flash-message">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="buttons-container">
+            <form method="GET" action="{{ url_for('logout') }}">
+                <button type="submit">Logout</button>
+            </form>
+            <button onclick="goBack()">Back</button>
+        </div>
+    </div>
+    <script>
+        function goBack() {
+            var userRole = "{{ user_role }}";
+            if (userRole === 'adminAuth') {
+                window.location.href = "{{ url_for('landing') }}";
+            } else {
+                window.history.back();
+            }
+        }
+    </script>
+</body>
+</html>
