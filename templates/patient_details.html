@@ -97,6 +97,21 @@
         .medical-info {
             margin-top: 20px;
         }
+
+        .form-group-inline {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .form-group-inline .form-group {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .form-group-inline .form-group:last-child {
+            margin-right: 0;
+        }
     </style>
 </head>
 <body>
@@ -186,11 +201,61 @@
                 </div>
             </div>
 
-            <div class="button-group">
-                {% if is_doctor %}
-                <button type="submit">Add Notes</button>
-                {% endif %}
+            <div class="medical-info">
+                <h2>Medical Information</h2>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" name="description" value="{{ patient.Description }}" disabled>
+                </div>
+
+                <h3>Vitals</h3>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="Temp">Temp:</label>
+                        <input type="text" id="Temp" name="Temp" value="{{ patient.Vitals.Temp }}" {% if is_doctor %}disabled{% endif %}>
+                    </div>
+                    <div class="form-group">
+                        <label for="HR">HR:</label>
+                        <input type="text" id="HR" name="HR" value="{{ patient.Vitals.HR }}" {% if is_doctor %}disabled{% endif %}>
+                    </div>
+                    <div class="form-group">
+                        <label for="RR">RR:</label>
+                        <input type="text" id="RR" name="RR" value="{{ patient.Vitals.RR }}" {% if is_doctor %}disabled{% endif %}>
+                    </div>
+                </div>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="BP">BP:</label>
+                        <input type="text" id="BP" name="BP" value="{{ patient.Vitals.BP }}" {% if is_doctor %}disabled{% endif %}>
+                    </div>
+                    <div class="form-group">
+                        <label for="SpO2">SpO2:</label>
+                        <input type="text" id="SpO2" name="SpO2" value="{{ patient.Vitals.SpO2 }}" {% if is_doctor %}disabled{% endif %}>
+                    </div>
+                    <div class="form-group">
+                        <label for="Wt">Wt:</label>
+                        <input type="text" id="Wt" name="Wt" value="{{ patient.Vitals.Wt }}" {% if is_doctor %}disabled{% endif %}>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="Ht">Ht:</label>
+                    <input type="text" id="Ht" name="Ht" value="{{ patient.Vitals.Ht }}" {% if is_doctor %}disabled{% endif %}>
+                </div>
+                <div class="form-group">
+                    <label for="Pain">Pain:</label>
+                    <input type="text" id="Pain" name="Pain" value="{{ patient.Vitals.Pain }}" {% if is_doctor %}disabled{% endif %}>
+                </div>
             </div>
+            <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea id="notes" name="notes" {% if not is_doctor %}disabled{% endif %}>{{ patient.Notes }}</textarea>
+            </div>
+        
+        <div class="button-group">
+            {% if is_doctor %}
+            <button type="submit">Add Notes</button>
+            {% endif %}
+        </div>
         </form>
 
         <div class="flash-message">

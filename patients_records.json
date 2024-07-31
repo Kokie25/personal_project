@@ -20,11 +20,21 @@
                 "Initials": "I",
                 "First Name": "Koketso",
                 "Last Name": "Motshana",
-                "Contact details": "0727014807"
+                "Contact details": "1111111111"
             },
-            "Description": "6uuhgh",
-            "FileNo": "47b36b8e",
-            "Notes": ""
+            "Description": "Consultation",
+            "FileNo": "3474b007",
+            "Notes": "",
+            "Vitals": {
+                "Temp": "12",
+                "HR": "12",
+                "RR": "12",
+                "BP": "12",
+                "SpO2": "21",
+                "Wt": "",
+                "Ht": "",
+                "Pain": "212"
+            }
         }
     ]
 }

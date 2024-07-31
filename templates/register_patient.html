@@ -9,7 +9,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 200vh;
+            height: 300vh;
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -19,7 +19,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 250%;
+            height: 350%;
             object-fit: fill;
             z-index: -1;
             opacity: 0.3; /* Adjust the opacity to make the image less prominent */
@@ -200,11 +200,64 @@
             <h2>Medical Information</h2>
             <div class="form-group">
                 <label for="description">Description:</label>
-                <textarea id="description" name="description" required></textarea>
+                <select id="description" name="description" required>
+                    <option value="Consultation">Consultation</option>
+                    <option value="Emergency">Emergency</option>
+                    <option value="Check-up">Check-up</option>
+                    <option value="Medication collection">Medication collection</option>
+                    <option value="Vaccination">Vaccination</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="Vitals">Vitals:</label>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="Temp">Temp:</label>
+                        <input type="text" id="Temp" name="Temp" placeholder="Temp" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="HR">HR:</label>
+                        <input type="text" id="HR" name="HR" placeholder="HR" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="RR">RR:</label>
+                        <input type="text" id="RR" name="RR" placeholder="RR" required>
+                    </div>
+                </div>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="BP">BP:</label>
+                        <input type="text" id="BP" name="BP" placeholder="BP" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="SpO2">SpO2:</label>
+                        <input type="text" id="SpO2" name="SpO2" placeholder="SpO2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Wt">Wt:</label>
+                        <input type="text" id="Wt" name="Wt" placeholder="Wt" required>
+                    </div>
+                </div>
+                <div class="form-group-inline">
+                    <div class="form-group">
+                        <label for="Ht">Ht:</label>
+                        <input type="text" id="Ht" name="Ht" placeholder="Ht" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Pain">Pain:</label>
+                        <input type="text" id="Pain" name="Pain" placeholder="Pain" required>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="notes">Notes:</label>
-                <textarea id="notes" name="notes" {% if session.get('role') != 'doctor' %}disabled{% endif %}></textarea>
+                <textarea id="notes" name="notes" rows="4"{% if session.get('role') != 'doctor' %}disabled{% endif %}></textarea>
+            </div>
+
+            <div class="button-group">
+                {% if is_doctor %}
+                <button type="submit">Add Notes</button>
+                {% endif %}
             </div>
             <button type="submit">Register Patient</button>
         </form>
@@ -222,12 +275,19 @@
     <script>
         function goBack() {
             var userRole = "{{ session.get('role', 'unknown') }}";
-            if (userRole === 'admin') {
-                window.location.href = "{{ url_for('landing') }}";
+            if (userRole === 'doctor' || userRole === 'admin') {
+                window.location.href = "{{ url_for('search_patient') }}";
             } else {
                 window.history.back();
             }
         }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const userRole = "{{ session.get('role', 'unknown') }}"; 
+            if (userRole !== 'doctor') {
+                document.querySelectorAll('input[name^="medication_name"], input[name^="medication_dosage"], input[name^="medication_frequency"]').forEach(el => el.disabled = true);
+            }
+        });
     </script>
 </body>
 </html>

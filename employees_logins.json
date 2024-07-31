@@ -1,64 +1,8 @@
 {
     "credentials": [
         {
-            "Username": "Ignacious",
-            "password": "29@admin"
-        },
-        {
-            "Username": "Princess",
-            "password": "127@admin"
-        },
-        {
-            "Username": "Palesa",
+            "Username": "Loky",
             "password": "23@admin"
-        },
-        {
-            "Username": "Princess",
-            "password": "Hlazo@admin"
-        },
-        {
-            "Username": "Mehla",
-            "password": "Mehla@admin"
-        },
-        {
-            "Username": "Kgothatso",
-            "password": "22@admin"
-        },
-        {
-            "Username": "Kgothatso",
-            "password": "22@admin"
-        },
-        {
-            "Username": "Lebo",
-            "password": "26@admin"
-        },
-        {
-            "Username": "Lebo",
-            "password": "26@admin"
-        },
-        {
-            "Username": "Lebo",
-            "password": "26@admin"
-        },
-        {
-            "Username": "Lebo",
-            "password": "26@admin"
-        },
-        {
-            "Username": "Lebo",
-            "password": "26@admin"
-        },
-        {
-            "Username": "Lebo",
-            "password": "26@admin"
-        },
-        {
-            "Username": "Kahlolo",
-            "password": "843@admin"
-        },
-        {
-            "Username": "Letsobana",
-            "password": "14@admin"
         }
     ]
 }

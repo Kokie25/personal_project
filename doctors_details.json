@@ -1,16 +1,8 @@
 {
     "Doctor": [
         {
-            "Username": "Koki",
-            "password": "26@dr_"
-        },
-        {
-            "Username": "Bofelo",
-            "password": "32@dr_"
-        },
-        {
-            "Username": "Setsa",
-            "password": "12@dr_"
+            "Username": "Doctor",
+            "password": "23@dr_"
         }
     ]
 }
