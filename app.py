@@ -272,7 +272,7 @@ def employee_registration():
 
         employee_data = load_employee_data()
         doctor_data = load_doctor_data()
-        pharm_data = load_pharm_data()
+   
         
 
         # Check for existing username in employees
