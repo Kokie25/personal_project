@@ -22,8 +22,6 @@ def save_employee_data(data):
 def save_doctor_data(data):
     save_json(data, 'doctors_details.json')
 
-def save_pharm_data(data):
-    save_json(data, 'pharma_cist.json')
 
 def save_patient_data(data):
     save_json(data, 'patients_records.json')
@@ -35,8 +33,6 @@ def unique_file_no():
 def load_employee_data():
     return load_json('employees_logins.json')
 
-def load_pharm_data():
-    return load_json('pharma_cist.json')
 
 def load_admin_data():
     return load_json('admin.json')
@@ -73,8 +69,6 @@ def login():
         data = load_employee_data()
         data_admin = load_admin_data()
         data_doctor = load_doctor_data()
-        data_pharm = load_pharm_data()
-
         password_correct = False
         user_exists = False
 
@@ -117,18 +111,6 @@ def login():
                             flash(f"{username} Logged in successfully")
                             return redirect(url_for('search_patient'))
                         
-        if not password_correct:
-        # Check doctor credentials
-            for pharm in data_pharm.get('Pharmacist', []):
-                if pharm['Username'] == username:
-                    user_exists = True
-                    if pharm['password'] == password:
-                        password_correct = True
-                        if '@pharm' in password:
-                            session['username'] = username  # Store username in session
-                            session['role'] = 'Pharmacist'
-                            flash(f"{username} Logged in successfully")
-                            return redirect(url_for('search_patient'))
 
         if user_exists:
             flash('Invalid username or password, try again or contact the admin')
@@ -262,20 +244,15 @@ def add_notes():
 
     identityno = request.form['identity_no'].strip()
     notes = request.form['notes'].strip()
-    # medication = {
-    #     "Medication Name": request.form.get('medication_name', '').strip(),
-    #     "Dosage": request.form.get('medication_dosage', '').strip(),
-    #     "Frequency": request.form.get('medication_frequency', '').strip()
-    # }
+    
 
     data = load_patient_data()
 
     for patient in data.get("patients", []):
         if patient["IdentityNo"] == identityno:
             patient["Notes"] = notes
-            # patient["Medication"] = medication
             save_patient_data(data)
-            flash("Notes and medication added successfully.", "success")
+            flash("Notes added successfully.", "success")
             return redirect(url_for('search_patient'))
 
     flash("Patient not found.", "error")
