@@ -1,5 +1,5 @@
 attrs==21.2.0
-bcc== 0.1.8,
+bcc== 0.1.8
 blinker==1.8.2
 Brlapi==0.8.3
 certifi==2020.6.20
